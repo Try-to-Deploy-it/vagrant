@@ -1,0 +1,90 @@
+---  
+- name: create directories for minio
+  file:
+   path: "{{ item }}"
+   state: directory
+   owner: minio-user
+   group: minio-user
+   mode: '0775'
+  with_items:
+    - /vagrant/minio_one
+    - /vagrant/minio_two
+    - /etc/minio_one
+    - /etc/minio_two
+
+- name: create default configuration file for first tenant
+  copy:
+    content: |
+      MINIO_VOLUMES="/vagrant/minio_one/"
+      MINIO_OPTS="-C /etc/minio_one --address 0.0.0.0:9000"
+    dest: "/etc/default/minio_one"
+    backup: yes
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: create default configuration file for second tenant
+  copy:
+    content: |
+     MINIO_VOLUMES="/vagrant/minio_two/"
+     MINIO_OPTS="-C /etc/minio_one --address 0.0.0.0:9001"
+    dest: "/etc/default/minio_two"
+    backup: yes
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: download minio
+  get_url:
+    url: https://dl.min.io/server/minio/release/linux-amd64/minio
+    dest: /usr/local/bin/minio
+    owner: minio-user
+    group: minio-user
+    mode: a+x
+
+- name: download daemon file for minio
+  get_url: url=https://raw.githubusercontent.com/minio/minio-service/master/linux-systemd/minio.service
+    dest={{item}} mode=0775
+  with_items:
+     - /etc/systemd/system/minio_one.service
+     - /etc/systemd/system/minio_two.service
+    
+- name: edit daemon file for tenant one
+  replace:
+    path: '/etc/systemd/system/minio_one.service'
+    regexp: '/etc/default/minio'
+    replace: "/etc/default/minio_one"
+
+- name: edit daemon file for tenant two
+  replace:
+    path: '/etc/systemd/system/minio_two.service'
+    regexp: '/etc/default/minio'
+    replace: "/etc/default/minio_two"
+
+- name: start and enable minio services
+  command: "{{item}}"
+  with_items:
+    - systemctl daemon-reload
+    - systemctl start minio_one.service
+    - systemctl start minio_two.service
+    - systemctl enable minio_one.service
+    - systemctl enable minio_two.service
+  register: reg_out
+
+- name: download minio-client
+  get_url: url=https://dl.min.io/client/mc/release/linux-amd64/mc
+    dest=/vagrant/mc mode=a+x
+
+- name: configure minio-client
+  command: /vagrant/mc config host add {{ ansible_hostname }} http://localhost:9000 minioadmin minioadmin
+  when: "'other' in group_names"
+  
+- name: configure minio-client
+  command: /vagrant/mc config host add {{ ansible_hostname }} http://localhost:9001 minioadmin minioadmin
+  when: "'vrrp' in group_names"
+  
+- name: create bucket in storage
+  command: /vagrant/mc mb testbucket
+  
+- name: start and enable nginx
+  service: name=nginx state=restarted 

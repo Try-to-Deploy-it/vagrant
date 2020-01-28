@@ -1,0 +1,6 @@
+---
+# tasks file for ansible_minio_quest
+
+- include_tasks: nginx_vrrp.yml
+
+- include_tasks: minio_server.yml

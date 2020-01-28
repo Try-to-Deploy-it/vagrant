@@ -1,0 +1,12 @@
+---
+- name: vagrant test
+  hosts: all
+  become: yes
+  roles:
+   - { role: ansible_minio_quest, when: ansible_os_family=="Debian" }
+
+
+
+
+
+

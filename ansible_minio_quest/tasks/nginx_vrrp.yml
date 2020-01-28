@@ -1,0 +1,36 @@
+- block: #block for VRRP
+    - name: install keepalived
+      apt: name=keepalived state=latest
+
+    - name: copy keepalived config for each node
+      copy:
+       src: keepalived_{{ ansible_hostname }}.conf
+       dest: /etc/keepalived/keepalived.conf
+       owner: root
+       group: root
+       mode: '0644'
+
+    - name: start and enable keepalived
+      service: name=keepalived state=started enabled=yes
+
+    - name: install nginx
+      apt: name=nginx state=latest
+
+    - name: copy nginx config
+      copy:
+       src: nginx.conf
+       dest: /etc/nginx/nginx.conf
+       owner: root
+       group: root
+       mode: '0744'
+ 
+    - name: start and enable nginx
+      service: name=nginx state=started enabled=yes
+
+    - name: configure minio-client
+      command: /vagrant/mc config host add {{ ansible_hostname }} http://localhost:9001 minioadmin minioadmin
+
+    - name: create bucket in storage
+      command: /vagrant/mc mb testbucket
+
+  when: "'vrrp' in group_names"

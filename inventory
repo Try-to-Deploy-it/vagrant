@@ -1,0 +1,22 @@
+[vrrp]
+node1 ansible_host=192.168.1.111
+node2 ansible_host=192.168.1.112
+node3 ansible_host=192.168.1.113
+
+[other]
+node4 ansible_host=192.168.1.114
+node5 ansible_host=192.168.1.115
+node6 ansible_host=192.168.1.116
+
+[all_nodes:children]
+vrrp
+other
+
+[vrrp:vars]
+ansible_user=vagrant
+ansible_password=vagrant
+
+
+[other:vars]
+ansible_user=vagrant
+ansible_password=vagrant
