@@ -2,21 +2,25 @@
 
 system configuration:
 #VRRP
-priority			120				 110			 100
-192.168.1.199	192.168.1.111	192.168.1.112	192.168.1.113
-192.168.1.198	192.168.1.112	192.168.1.113	192.168.1.111
-192.168.1.197	192.168.1.113	192.168.1.111	192.168.1.112
+
+	priority	    120		    110		    100
+
+	192.168.1.199	192.168.1.111	192.168.1.112	192.168.1.113
+	192.168.1.198	192.168.1.112	192.168.1.113	192.168.1.111
+	192.168.1.197	192.168.1.113	192.168.1.111	192.168.1.112
 
 #Minio ports:
 tenant_one: 80
+
     reverse proxy and balancing for:
-	192.168.1.111:9000
+   	192.168.1.111:9000
 	192.168.1.112:9000
 	192.168.1.113:9000
 	192.168.1.114:9000
 	192.168.1.115:9000
 	192.168.1.116:9000
 tenant_two: 81
+
 	reverse proxy and balancing for:
 	192.168.1.111:9001
 	192.168.1.112:9001
@@ -26,12 +30,16 @@ tenant_two: 81
 	192.168.1.116:9001
 
 #Autorization:
- node1-6
-ssh_user: vagrant
-ssh_pass: vagrant
- minio system
-access_key: minioadmin
-secret_key: minioadmin
+
+ node1-6:
+ 
+	ssh_user: vagrant
+	ssh_pass: vagrant
+ 
+ minio system:
+ 
+	access_key: minioadmin
+	secret_key: minioadmin
 
 #system startup commands
 1. vagran up                      #to start VMs
