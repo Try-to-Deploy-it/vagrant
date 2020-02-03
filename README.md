@@ -56,5 +56,5 @@ tenant_two: 81
 # the third way to upload file
 4.3 ansible node1 -m copy -a "src=./test.jpg dest=/vagrant/minio_two/testbucket"
 
-#python script dowloading the file with offset
+# python script dowloading the file with offset
 5. file.py 
